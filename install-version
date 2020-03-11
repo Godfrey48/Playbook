@@ -1,0 +1,27 @@
+---
+- hosts: all
+  tasks:
+  - name: packages
+    yum: name={{item}} state=latest
+    register: new_package
+    with_items:
+     - php
+     - epel-release
+
+  - name: its installed
+    command: php --version
+    register: package
+
+#  - debug:
+#      msg: "{{ package.stdout }}"
+
+
+  - name: not installed
+    debug:
+      msg: "install"
+    when: package is succeeded
+
+  - name: not installed
+    debug:
+      msg: "not installed"
+    when: package is failed
