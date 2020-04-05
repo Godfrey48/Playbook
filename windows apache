@@ -1,0 +1,34 @@
+---
+# tasks file for apache
+- hosts: win
+  tasks:
+  - name: install apache
+    win_chocolatey:
+      name: apache-httpd
+      state: present
+  - name: download php from URL
+    win_get_url:
+      url: https://windows.php.net/downloads/releases/php-7.3.16-Win32-VC15-x86.zip
+      dest: C:\ProgramData\php-7.3.16-Win32-VC15-x86.zip
+  - name: unzip php
+    win_unzip:
+      src: C:\ProgramData\php-7.3.16-Win32-VC15-x86.zip
+      dest: C:\ProgramData\php-7.3.16-Win32-VC15-x86
+  - name: copy php file to htdocs
+    win_copy:
+      src: /etc/ansible/static-hosts/demo.php
+      dest: C:\Users\zippyops\AppData\Roaming\Apache24\htdocs\demo.php
+  - name: inbound & outbound
+    win_firewall_rule:
+      name: httpd
+      localport: 80
+      action: allow
+      direction: in
+      protocol: tcp
+      state: present
+      enabled: yes
+  - name: start httpd
+    win_service:
+      name: apache
+      start_mode: auto
+      state: stopped
